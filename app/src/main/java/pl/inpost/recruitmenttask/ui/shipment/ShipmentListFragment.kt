@@ -1,7 +1,12 @@
 package pl.inpost.recruitmenttask.ui.shipment
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,8 +22,8 @@ class ShipmentListFragment : Fragment() {
     private var _binding: FragmentShipmentListBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var shipmentAdapter: ShipmentListAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var shipmentAdapter: ShipmentListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +35,27 @@ class ShipmentListFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.readyToPickupShipmentsMenu -> {
+            viewModel.showReadyToPickUp()
+            true
+        }
+
+        R.id.otherShipmentsMenu -> {
+            viewModel.showOtherShipments()
+            true
+        }
+
+        R.id.allShipmentsMenu -> {
+            viewModel.loadAllShipments()
+            true
+        }
+
+        else -> false
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentShipmentListBinding.inflate(inflater, container, false)
         return binding.root
@@ -51,8 +73,19 @@ class ShipmentListFragment : Fragment() {
     }
 
     private fun setListeners() {
-        viewModel.viewState.observe(requireActivity()) { shipments ->
-            shipmentAdapter.setData(shipments)
+        viewModel.initViewState.observe(viewLifecycleOwner) {
+            shipmentAdapter.setData(it)
+        }
+        viewModel.items.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
+                shipmentAdapter.setData(it)
+            }
+        }
+        viewModel.getRawJson.observe(viewLifecycleOwner) {
+            val json = requireContext().resources.openRawResource(R.raw.mock_shipment_api_response)
+                .bufferedReader().use { it.readText() }
+            //when there is no raw json we do not need json param below function
+            viewModel.setRawJson(json)
         }
     }
 
@@ -60,6 +93,10 @@ class ShipmentListFragment : Fragment() {
         shipmentAdapter = ShipmentListAdapter()
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        setupAdapter()
+    }
+
+    private fun setupAdapter() {
         recyclerView.adapter = shipmentAdapter
     }
 

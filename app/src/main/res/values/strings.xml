@@ -14,4 +14,9 @@
     <string name="status_pickup_time_expired">Upłynął termin odbioru</string>
     <string name="status_ready_to_pickup">Gotowa do odbioru</string>
     <string name="status_returned_to_sender">Zwrot do Nadawcy</string>
+    <string name="status_all_types">All types</string>
+    <string name="successfully_saved_task_message">Task saved</string>
+    <string name="successfully_deleted_task_message">Task was deleted</string>
+    <string name="successfully_added_task_message">Task added</string>
+    <string name="loading_tasks_error">Loading error</string>
 </resources>

@@ -34,5 +34,22 @@ enum class ShipmentStatus(
     OUT_FOR_DELIVERY(R.string.status_out_for_delivery),
     PICKUP_TIME_EXPIRED(R.string.status_pickup_time_expired),
     READY_TO_PICKUP(R.string.status_ready_to_pickup),
-    RETURNED_TO_SENDER(R.string.status_returned_to_sender);
+    RETURNED_TO_SENDER(R.string.status_returned_to_sender),
+    ALL(R.string.status_all_types);
+
+    companion object {
+        fun valueOfOrNull(name: String?): ShipmentStatus? {
+            if (name == null) {
+                return null
+            }
+
+            return try {
+                valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+    }
 }
+
+
