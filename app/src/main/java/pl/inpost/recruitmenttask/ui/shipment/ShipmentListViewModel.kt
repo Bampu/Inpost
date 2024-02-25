@@ -7,12 +7,10 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import pl.inpost.recruitmenttask.Event
-import pl.inpost.recruitmenttask.R
 import pl.inpost.recruitmenttask.data.Result
-import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 import pl.inpost.recruitmenttask.data.source.model.Shipment
 import pl.inpost.recruitmenttask.data.source.model.ShipmentStatus
+import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 import pl.inpost.recruitmenttask.utils.setState
 import javax.inject.Inject
 
@@ -40,7 +38,6 @@ class ShipmentListViewModel @Inject constructor(
             _dataLoading.value = true
             viewModelScope.launch {
                 shipmentsRepository.refreshShipments(json = rawJson)
-                _dataLoading.value = false
             }
         }
         shipmentsRepository.observeShipments().switchMap { filterShipments(it) }
@@ -64,40 +61,42 @@ class ShipmentListViewModel @Inject constructor(
         _getRawJson.value = true
     }
 
-    private fun filterShipments(tasksResult: Result<List<Shipment>>): LiveData<List<Shipment>> {
+    private fun filterShipments(shipmentsResult: Result<List<Shipment>>): LiveData<List<Shipment>> {
         val result = MutableLiveData<List<Shipment>>()
 
-        if (tasksResult is Result.Success) {
+        if (shipmentsResult is Result.Success) {
             isDataLoadingError.value = false
             viewModelScope.launch {
-                result.value = filterItems(tasksResult.data, currentFiltering)
+                result.value = filterItems(shipmentsResult.data, currentFiltering)
             }
         } else {
             result.value = emptyList()
             isDataLoadingError.value = true
         }
-
+        _dataLoading.value = false
         return result
     }
 
-    private fun filterItems(tasks: List<Shipment>, filteringType: ShipmentStatus): List<Shipment> {
-        val tasksToShow = ArrayList<Shipment>()
+    private fun filterItems(
+        shipments: List<Shipment>,
+        filteringType: ShipmentStatus
+    ): List<Shipment> {
+        val shipmentsToShow = ArrayList<Shipment>()
         val filteringTypeName = filteringType.name
-        // We filter the tasks based on the requestType
-        for (task in tasks) {
-            val statusName = ShipmentStatus.valueOfOrNull(task.status)?.name
+        for (shipment in shipments) {
+            val statusName = ShipmentStatus.valueOfOrNull(shipment.status)?.name
             when (filteringType) {
                 ShipmentStatus.ALL -> {
-                    tasksToShow.clear()
-                    tasksToShow.addAll(tasks)
+                    shipmentsToShow.clear()
+                    shipmentsToShow.addAll(shipments)
                 }
 
-                else -> {/* just show all */
-                    if (statusName.equals(filteringTypeName)) tasksToShow.add(task)
+                else -> {
+                    if (statusName.equals(filteringTypeName)) shipmentsToShow.add(shipment)
                 }
             }
         }
-        return tasksToShow
+        return shipmentsToShow
     }
 
     private fun initData() {
@@ -112,6 +111,7 @@ class ShipmentListViewModel @Inject constructor(
     }
 
     private fun setFiltering(requestType: ShipmentStatus, forceUpdate: Boolean = false) {
+        _dataLoading.value = true
         currentFiltering = requestType
         loadShipments(forceUpdate)
     }
@@ -127,6 +127,17 @@ class ShipmentListViewModel @Inject constructor(
 
     fun loadAllShipments() {
         setFiltering(ShipmentStatus.ALL, forceUpdate = true)
+    }
+
+    fun showArchived() {
+        viewModelScope.launch {
+            val archived = shipmentsRepository.getArchived()
+            if (archived is Result.Success) {
+                _initViewState.setState { archived.data }
+            } else if (archived is Result.Error) {
+                throw archived.exception
+            }
+        }
     }
 
     private fun loadShipments(forceUpdate: Boolean) {

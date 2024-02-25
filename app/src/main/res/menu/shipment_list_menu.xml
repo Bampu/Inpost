@@ -13,4 +13,8 @@
         android:id="@+id/allShipmentsMenu"
         android:title="Wszystkie"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/archived"
+        android:title="Archived"
+        app:showAsAction="never" />
 </menu>

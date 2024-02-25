@@ -20,24 +20,32 @@ class DefaultShipmentsRepository @Inject constructor(
 ) : ShipmentsRepository {
     override suspend fun getShipments(json: String?): Result<List<Shipment>> {
         try {
-            updateTasksFromRemoteDataSource(json)
+            updateShipmentsFromRemoteDataSource(json)
         } catch (ex: Exception) {
             return Error(ex)
         }
         return shipmentLocalDataSource.getShipments()
     }
 
-    private suspend fun updateTasksFromRemoteDataSource(json: String?) {
+    override suspend fun getArchived(): Result<List<Shipment>> {
+        return try {
+            shipmentLocalDataSource.getArchived()
+        } catch (e: Exception) {
+            return Error(e)
+        }
+    }
 
-        val remoteTasks = shipmentsRemoteDataSource.getShipments(json)
+    private suspend fun updateShipmentsFromRemoteDataSource(json: String?) {
 
-        if (remoteTasks is Success) {
-            shipmentLocalDataSource.deleteAllTasks()
-            remoteTasks.data.shipments.forEach { task ->
+        val remoteShipments = shipmentsRemoteDataSource.getShipments(json)
+
+        if (remoteShipments is Success) {
+            shipmentLocalDataSource.deleteAllShipments()
+            remoteShipments.data.shipments.forEach { task ->
                 shipmentLocalDataSource.saveShipment(task)
             }
-        } else if (remoteTasks is Error) {
-            throw remoteTasks.exception
+        } else if (remoteShipments is Error) {
+            throw remoteShipments.exception
         }
     }
 
@@ -46,14 +54,14 @@ class DefaultShipmentsRepository @Inject constructor(
     }
 
     override suspend fun refreshShipments(json: String?) {
-        updateTasksFromRemoteDataSource(json)
+        updateShipmentsFromRemoteDataSource(json)
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAllShipments() {
         withContext(Dispatchers.IO) {
             coroutineScope {
-                launch { shipmentsRemoteDataSource.deleteAllTasks() }
-                launch { shipmentLocalDataSource.deleteAllTasks() }
+                launch { shipmentsRemoteDataSource.deleteAllShipments() }
+                launch { shipmentLocalDataSource.deleteAllShipments() }
             }
         }
     }

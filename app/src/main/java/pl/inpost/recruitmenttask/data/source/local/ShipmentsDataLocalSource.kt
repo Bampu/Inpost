@@ -27,7 +27,15 @@ class ShipmentsDataLocalSource @Inject constructor(
         }
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun getArchived(): Result<List<Shipment>> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            Success(shipmentsDao.getArchived(true))
+        } catch (e: Exception) {
+            Error(e)
+        }
+    }
+
+    override suspend fun deleteAllShipments() {
         shipmentsDao.deleteShipments()
     }
 

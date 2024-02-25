@@ -7,6 +7,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import pl.inpost.recruitmenttask.R
 import pl.inpost.recruitmenttask.databinding.FragmentShipmentListBinding
+import pl.inpost.recruitmenttask.utils.gone
+import pl.inpost.recruitmenttask.utils.visible
 
 @AndroidEntryPoint
 class ShipmentListFragment : Fragment() {
@@ -24,6 +28,8 @@ class ShipmentListFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var shipmentAdapter: ShipmentListAdapter
+    private lateinit var noResultsFound: TextView
+    private lateinit var progressLoader: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +54,11 @@ class ShipmentListFragment : Fragment() {
 
         R.id.allShipmentsMenu -> {
             viewModel.loadAllShipments()
+            true
+        }
+
+        R.id.archived -> {
+            viewModel.showArchived()
             true
         }
 
@@ -79,6 +90,15 @@ class ShipmentListFragment : Fragment() {
         viewModel.items.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 shipmentAdapter.setData(it)
+                hideFilterInfo()
+            } else {
+                showEmptyFilterInfo()
+            }
+        }
+        viewModel.dataLoading.observe(viewLifecycleOwner) {
+            when(it) {
+                true -> progressLoader.visible()
+                false -> progressLoader.gone()
             }
         }
         viewModel.getRawJson.observe(viewLifecycleOwner) {
@@ -89,7 +109,19 @@ class ShipmentListFragment : Fragment() {
         }
     }
 
+    private fun showEmptyFilterInfo() {
+        recyclerView.gone()
+        noResultsFound.visible()
+    }
+
+    private fun hideFilterInfo() {
+        recyclerView.visible()
+        noResultsFound.gone()
+    }
+
     private fun setupViews() {
+        noResultsFound = binding.noResultsFound
+        progressLoader = binding.progressBar
         shipmentAdapter = ShipmentListAdapter()
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

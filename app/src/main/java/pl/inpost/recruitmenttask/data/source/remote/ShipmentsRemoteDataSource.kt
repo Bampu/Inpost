@@ -27,7 +27,7 @@ class ShipmentsRemoteDataSource @Inject constructor(
         return Success(shipments)
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAllShipments() {
     }
 
     override suspend fun saveShipment(shipment: Shipment) {

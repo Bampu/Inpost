@@ -16,6 +16,9 @@ interface ShipmentsDao {
     @Query("SELECT * FROM Shipments")
     suspend fun getShipments(): List<Shipment>
 
+    @Query("SELECT * FROM Shipments WHERE isArchived = :paramValue")
+    suspend fun getArchived(paramValue: Boolean): List<Shipment>
+
     @Query("DELETE FROM Shipments")
     suspend fun deleteShipments()
 

@@ -15,5 +15,6 @@ data class Shipment(
     val sender: Sender?,
     val shipmentType: String?,
     val status: String?,
-    val storedDate: String?
+    val storedDate: String?,
+    val isArchived: Boolean = false
 )

@@ -6,6 +6,6 @@ import pl.inpost.recruitmenttask.data.source.model.Shipment
 
 interface ShipmentsDataSource {
     fun observeShipments(): LiveData<Result<List<Shipment>>>
-    suspend fun deleteAllTasks()
+    suspend fun deleteAllShipments()
     suspend fun saveShipment(shipment: Shipment)
 }
