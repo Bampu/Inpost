@@ -41,7 +41,7 @@
             android:id="@+id/courierImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/kurier"
+            android:src="@drawable/courier"
             app:layout_constraintBottom_toBottomOf="@id/shipmentNumber"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/shipmentNumberLabel" />
@@ -96,6 +96,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_light"
             android:text="Wydana do doręczenia"
+            android:gravity="end"
             android:textAllCaps="true"
             android:textColor="@color/grey"
             app:layout_constraintEnd_toEndOf="parent"

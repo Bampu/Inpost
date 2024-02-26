@@ -83,7 +83,7 @@ class ShipmentListAdapter(private val onArchivedListener: OnArchivedListener) :
 
         private fun resolveShipmentIcon(shipmentType: String?): Int {
             return when (Shipment.valueOfOrNull(shipmentType)) {
-                Shipment.COURIER -> R.drawable.kurier
+                Shipment.COURIER -> R.drawable.courier
                 Shipment.PARCEL_LOCKER -> R.drawable.parcel
                 else -> R.drawable.parcel
             }
