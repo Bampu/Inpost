@@ -19,21 +19,23 @@ class ShipmentsDataLocalSource @Inject constructor(
         }
     }
 
-    override suspend fun getShipments(): Result<List<AdapterItem.Shipment>> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            Success(shipmentsDao.getShipments())
-        } catch (e: Exception) {
-            Error(e)
+    override suspend fun getShipments(): Result<List<AdapterItem.Shipment>> =
+        withContext(Dispatchers.IO) {
+            return@withContext try {
+                Success(shipmentsDao.getShipments())
+            } catch (e: Exception) {
+                Error(e)
+            }
         }
-    }
 
-    override suspend fun getArchived(): Result<List<AdapterItem.Shipment>> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            Success(shipmentsDao.getArchived())
-        } catch (e: Exception) {
-            Error(e)
+    override suspend fun getArchived(): Result<List<AdapterItem.Shipment>> =
+        withContext(Dispatchers.IO) {
+            return@withContext try {
+                Success(shipmentsDao.getArchived())
+            } catch (e: Exception) {
+                Error(e)
+            }
         }
-    }
 
     override suspend fun deleteAllShipments() {
         shipmentsDao.deleteShipments()

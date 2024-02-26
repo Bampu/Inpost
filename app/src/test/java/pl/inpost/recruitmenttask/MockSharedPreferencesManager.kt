@@ -11,7 +11,7 @@ class MockSharedPreferencesManager : SharedPreferencesManager {
     }
 
     override fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-        return (preferencesMap[key] ?: defaultValue) as?  Boolean ?: false
+        return (preferencesMap[key] ?: defaultValue) as? Boolean ?: false
     }
 
     override fun putString(key: String, value: String) {

@@ -79,7 +79,7 @@ class ShipmentListViewModelTest {
     }
 
     @Test
-    fun showArchived_shouldNotBeEmpty()  = runTest {
+    fun showArchived_shouldNotBeEmpty() = runTest {
         viewModel.showArchived()
         advanceUntilIdle()
         assertThat(viewModel.items.getOrAwaitValue(), not(emptyList()))
@@ -89,7 +89,7 @@ class ShipmentListViewModelTest {
     fun getAllShipments_shouldNotBeEmpty() = runTest {
         viewModel.loadAllShipments()
         advanceUntilIdle()
-        assertThat(viewModel.items.getOrAwaitValue() ,not(emptyList()))
+        assertThat(viewModel.items.getOrAwaitValue(), not(emptyList()))
     }
 
     @Test
@@ -116,7 +116,7 @@ class ShipmentListViewModelTest {
         viewModel = ShipmentListViewModel(shipmentsRepository, sharedPreferences)
     }
 
-    private fun generateShipmentWithStatus(status: ShipmentStatus =  ShipmentStatus.READY_TO_PICKUP): AdapterItem.Shipment {
+    private fun generateShipmentWithStatus(status: ShipmentStatus = ShipmentStatus.READY_TO_PICKUP): AdapterItem.Shipment {
         return AdapterItem.Shipment(
             arrayListOf(EventLog("date", "name")),
             "expiry date",

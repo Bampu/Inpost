@@ -8,7 +8,7 @@ import java.lang.Exception
 
 class FakeLocalDataSource(
     private var shipments: MutableList<AdapterItem.Shipment>? = mutableListOf()
-): LocalDataSource {
+) : LocalDataSource {
     override suspend fun getShipments(): Result<List<AdapterItem.Shipment>> {
         shipments?.let {
             return Result.Success(it)

@@ -36,7 +36,7 @@ class SwipeToDeleteCallback(
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-        if(canItemBeSwiped(position)) {
+        if (canItemBeSwiped(position)) {
             adapter.removeItem(position)
         } else {
             notifyDataSetChanged()

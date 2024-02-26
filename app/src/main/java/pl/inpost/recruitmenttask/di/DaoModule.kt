@@ -30,7 +30,7 @@ class DaoModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("your_pref_name", Context.MODE_PRIVATE)
+        return context.getSharedPreferences("ShipmentPref", Context.MODE_PRIVATE)
     }
 
     @Provides

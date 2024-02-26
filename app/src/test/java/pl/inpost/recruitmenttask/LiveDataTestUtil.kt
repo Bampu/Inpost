@@ -15,7 +15,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
 ): T {
     var data: T? = null
     val latch = CountDownLatch(1)
-    val observer = object: Observer<T> {
+    val observer = object : Observer<T> {
         override fun onChanged(t: T) {
             data = t
             latch.countDown()
@@ -25,7 +25,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
     this.observeForever(observer)
     try {
         afterObserver.invoke()
-        if(!latch.await(time, timeUnit)) {
+        if (!latch.await(time, timeUnit)) {
             throw TimeoutException("LiveData value was never set.")
         }
     } finally {

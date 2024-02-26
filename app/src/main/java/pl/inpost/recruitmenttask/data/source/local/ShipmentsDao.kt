@@ -9,7 +9,6 @@ import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 
 @Dao
 interface ShipmentsDao {
-
     @Query("SELECT * FROM Shipments")
     fun observeShipments(): LiveData<List<AdapterItem.Shipment>>
 

@@ -9,6 +9,5 @@ import pl.inpost.recruitmenttask.utils.DataClassConverter
 @Database(entities = [AdapterItem.Shipment::class], version = 1, exportSchema = false)
 @TypeConverters(DataClassConverter::class)
 abstract class ShipmentDataBase : RoomDatabase() {
-
     abstract fun shipmentDao(): ShipmentsDao
 }

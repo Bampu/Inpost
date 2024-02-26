@@ -2,7 +2,8 @@ package pl.inpost.recruitmenttask.data.source.local
 
 import android.content.SharedPreferences
 
-class SharedPreferencesManagerImpl(private val sharedPreferences: SharedPreferences) : SharedPreferencesManager {
+class SharedPreferencesManagerImpl(private val sharedPreferences: SharedPreferences) :
+    SharedPreferencesManager {
     override fun getString(key: String, defaultValue: String): String? {
         return sharedPreferences.getString(key, defaultValue)
     }

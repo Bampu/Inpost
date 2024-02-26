@@ -60,7 +60,7 @@ class DefaultShipmentsRepositoryTest {
         assertThat(shipments.data, IsEqual(remoteShipments))
     }
 
-    private fun generateShipmentWithStatus(status: ShipmentStatus =  ShipmentStatus.READY_TO_PICKUP): AdapterItem.Shipment {
+    private fun generateShipmentWithStatus(status: ShipmentStatus = ShipmentStatus.READY_TO_PICKUP): AdapterItem.Shipment {
         return AdapterItem.Shipment(
             arrayListOf(EventLog("date", "name")),
             "expiry date",

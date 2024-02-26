@@ -152,11 +152,11 @@ class ShipmentListViewModel @Inject constructor(
         initData()
     }
 
-    fun getRawJson() : String?{
+    fun getRawJson(): String? {
         return rawJson
     }
 
-    fun getCurrentFiltering() : ShipmentStatus? {
+    fun getCurrentFiltering(): ShipmentStatus? {
         return currentFiltering
     }
 
