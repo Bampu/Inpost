@@ -44,11 +44,7 @@ class ShipmentsDataLocalSource @Inject constructor(
     }
 
     override suspend fun archiveShipment(archive: AdapterItem.Shipment) {
-        println("getShipments = " + (getShipments() as Success).data.size)
-        println("getArchived = " + (getArchived() as Success).data.size)
         shipmentsDao.removeShipmentByNumber(archive.number)
-        println("getShipments = " + (getShipments() as Success).data.size)
         shipmentsDao.insertShipment(archive)
-        println("getArchived = " + (getArchived() as Success).data.size)
     }
 }

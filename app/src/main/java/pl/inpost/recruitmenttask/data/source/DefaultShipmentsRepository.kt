@@ -1,6 +1,7 @@
 package pl.inpost.recruitmenttask.data.source
 
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 class DefaultShipmentsRepository @Inject constructor(
     private val shipmentLocalDataSource: LocalDataSource,
-    private val shipmentsRemoteDataSource: RemoteDataSource
+    private val shipmentsRemoteDataSource: RemoteDataSource,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : ShipmentsRepository {
 
 

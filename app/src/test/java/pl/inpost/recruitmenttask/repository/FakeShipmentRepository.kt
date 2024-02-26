@@ -8,18 +8,19 @@ import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 
 class FakeShipmentRepository : ShipmentsRepository {
-    val tasksServiceData: LinkedHashMap<String, AdapterItem.Shipment> = LinkedHashMap()
+    val shipmentsServiceData: LinkedHashMap<String, AdapterItem.Shipment> = LinkedHashMap()
+    val archivedServiceData: LinkedHashMap<String, AdapterItem.Shipment> = LinkedHashMap()
     private val observableShipments = MutableLiveData<Result<List<AdapterItem.Shipment>>>()
     override suspend fun getShipments(json: String?): Result<List<AdapterItem.Shipment>> {
-        return Result.Success(tasksServiceData.values.toList())
+        return Result.Success(shipmentsServiceData.values.toList())
     }
 
     override suspend fun getArchived(): Result<List<AdapterItem.Shipment>> {
-        TODO("Not yet implemented")
+        return Result.Success(archivedServiceData.values.toList())
     }
 
     override suspend fun archiveShipment(archive: AdapterItem.Shipment) {
-        TODO("Not yet implemented")
+        addArchived(archive)
     }
 
     override fun observeShipments(): LiveData<Result<List<AdapterItem.Shipment>>> {
@@ -39,8 +40,14 @@ class FakeShipmentRepository : ShipmentsRepository {
 
     fun addShipments(vararg shipments: AdapterItem.Shipment) {
         for (shipment in shipments) {
-            tasksServiceData[shipment.number] = shipment
+            shipmentsServiceData[shipment.number] = shipment
         }
         runBlocking { refreshShipments(null) }
+    }
+
+    fun addArchived(vararg archived: AdapterItem.Shipment) {
+        for (archive in archived) {
+            archivedServiceData[archive.number] = archive
+        }
     }
 }

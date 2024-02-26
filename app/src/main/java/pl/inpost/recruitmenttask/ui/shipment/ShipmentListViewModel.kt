@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pl.inpost.recruitmenttask.data.Result
-import pl.inpost.recruitmenttask.data.source.local.CustomSharedPreferences
+import pl.inpost.recruitmenttask.data.source.local.SharedPreferencesManager
 import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.data.source.model.ShipmentStatus
 import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
@@ -18,12 +18,12 @@ import javax.inject.Inject
 @HiltViewModel
 class ShipmentListViewModel @Inject constructor(
     private val shipmentsRepository: ShipmentsRepository,
-    private val sharedPreferences: CustomSharedPreferences
+    private val sharedPreferences: SharedPreferencesManager
 ) : ViewModel() {
 
-    private val _initViewState = MutableLiveData<List<AdapterItem.Shipment>>(emptyList())
-    val initViewState: LiveData<List<AdapterItem.Shipment>>
-        get() = _initViewState
+    private val _items = MutableLiveData<List<AdapterItem.Shipment>>(mutableListOf())
+    val items: LiveData<List<AdapterItem.Shipment>>
+        get() = _items
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -38,9 +38,9 @@ class ShipmentListViewModel @Inject constructor(
 
     init {
         _dataLoading.value = true
-        if (!sharedPreferences.isActionExecuted(FIRST_TIME_DATA_LOAD)) {
+        if (!sharedPreferences.getBoolean(FIRST_TIME_DATA_LOAD, false)) {
             initJson()
-            sharedPreferences.setActionExecuted(FIRST_TIME_DATA_LOAD)
+            saveFirstTimeLoad()
             rawJson = null
         } else {
             loadAllShipments()
@@ -50,6 +50,10 @@ class ShipmentListViewModel @Inject constructor(
     //only needed when raw json exist
     private fun initJson() {
         _getRawJson.value = true
+    }
+
+    private fun saveFirstTimeLoad() {
+        sharedPreferences.putBoolean(FIRST_TIME_DATA_LOAD, true)
     }
 
     private fun filterItems(
@@ -85,7 +89,7 @@ class ShipmentListViewModel @Inject constructor(
         viewModelScope.launch {
             val shipments = shipmentsRepository.getShipments(json = rawJson)
             if (shipments is Result.Success) {
-                _initViewState.setState { shipments.data }
+                _items.setState { shipments.data }
             } else if (shipments is Result.Error) {
                 throw shipments.exception
             }
@@ -117,7 +121,7 @@ class ShipmentListViewModel @Inject constructor(
         viewModelScope.launch {
             val archived = shipmentsRepository.getArchived()
             if (archived is Result.Success) {
-                _initViewState.setState { archived.data }
+                _items.setState { archived.data }
             } else if (archived is Result.Error) {
                 throw archived.exception
             }
@@ -129,7 +133,7 @@ class ShipmentListViewModel @Inject constructor(
         viewModelScope.launch {
             val shipments = shipmentsRepository.getShipments(null)
             if (shipments is Result.Success) {
-                _initViewState.setState { filterItems(shipments.data) }
+                _items.setState { filterItems(shipments.data) }
             } else if (shipments is Result.Error) {
                 throw shipments.exception
             }
@@ -146,6 +150,14 @@ class ShipmentListViewModel @Inject constructor(
     fun setRawJson(json: String?) {
         this.rawJson = json
         initData()
+    }
+
+    fun getRawJson() : String?{
+        return rawJson
+    }
+
+    fun getCurrentFiltering() : ShipmentStatus? {
+        return currentFiltering
     }
 
     companion object {

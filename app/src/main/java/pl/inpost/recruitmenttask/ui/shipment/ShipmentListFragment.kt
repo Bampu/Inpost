@@ -91,7 +91,7 @@ class ShipmentListFragment : Fragment(), OnArchivedListener {
     }
 
     private fun setListeners() {
-        viewModel.initViewState.observe(viewLifecycleOwner) {
+        viewModel.items.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 shipmentAdapter.setData(sortData(it))
                 hideFilterInfo()

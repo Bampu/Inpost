@@ -1,12 +1,13 @@
 package pl.inpost.recruitmenttask.di
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import pl.inpost.recruitmenttask.data.source.local.CustomSharedPreferences
+import pl.inpost.recruitmenttask.data.source.local.SharedPreferencesManager
 import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 import pl.inpost.recruitmenttask.ui.shipment.ShipmentListViewModel
 
@@ -18,8 +19,8 @@ object ViewModelModule {
     @ViewModelScoped
     fun provideYourViewModel(
         shipmentsRepository: ShipmentsRepository,
-        sharedPreferences: CustomSharedPreferences
+        sharedPreferencesManager: SharedPreferencesManager
     ): ViewModel {
-        return ShipmentListViewModel(shipmentsRepository, sharedPreferences)
+        return ShipmentListViewModel(shipmentsRepository, sharedPreferencesManager)
     }
 }
