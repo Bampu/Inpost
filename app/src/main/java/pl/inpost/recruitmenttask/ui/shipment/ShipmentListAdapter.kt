@@ -2,9 +2,11 @@ package pl.inpost.recruitmenttask.ui.shipment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import pl.inpost.recruitmenttask.R
 import pl.inpost.recruitmenttask.data.source.model.AdapterItem
+import pl.inpost.recruitmenttask.data.source.model.Shipment
 import pl.inpost.recruitmenttask.data.source.model.ShipmentStatus
 import pl.inpost.recruitmenttask.databinding.ReadyForPickupBinding
 import pl.inpost.recruitmenttask.databinding.RemainingItemBinding
@@ -15,12 +17,16 @@ class ShipmentListAdapter(private val onArchivedListener: OnArchivedListener) :
     private var dataSet: MutableList<AdapterItem> = mutableListOf()
     private val readyToPickupItem = AdapterItem.ReadyForPickupItem()
     private val remainingItem = AdapterItem.RemainingItem()
-//    fun setData(dataSet: Pair<List<AdapterItem>, List<AdapterItem>>) {
-    fun setData(dataSet: List<AdapterItem>) {
+    fun setData(dataSet: Pair<List<AdapterItem>, List<AdapterItem>>) {
         this.dataSet.clear()
-        this.dataSet.add(FIRST_ITEM, readyToPickupItem)
-        this.dataSet.addAll(dataSet)
-        this.dataSet.add(remainingItem)
+        if (dataSet.first.isNotEmpty()) {
+            this.dataSet.add(FIRST_ITEM, readyToPickupItem)
+            this.dataSet.addAll(dataSet.first)
+        }
+        if (dataSet.second.isNotEmpty()) {
+            this.dataSet.add(remainingItem)
+            this.dataSet.addAll(dataSet.second)
+        }
         notifyDataSetChanged()
     }
 
@@ -62,10 +68,25 @@ class ShipmentListAdapter(private val onArchivedListener: OnArchivedListener) :
         fun bind(item: AdapterItem.Shipment, statusLabel: String) {
             binding.shipmentNumber.text = item.number
             binding.statusValue.text = statusLabel
+            binding.courierImage.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    itemView.resources,
+                    resolveShipmentIcon(item.shipmentType),
+                    null
+                )
+            )
             binding.senderValue.text =
                 item.sender?.email ?: item.sender?.name ?: item.sender?.phoneNumber
             binding.eventLabel.text = item.eventLog?.lastOrNull()?.name
             binding.eventDate.text = item.eventLog?.lastOrNull()?.date
+        }
+
+        private fun resolveShipmentIcon(shipmentType: String?): Int {
+            return when (Shipment.valueOfOrNull(shipmentType)) {
+                Shipment.COURIER -> R.drawable.kurier
+                Shipment.PARCEL_LOCKER -> R.drawable.parcel
+                else -> R.drawable.parcel
+            }
         }
     }
 

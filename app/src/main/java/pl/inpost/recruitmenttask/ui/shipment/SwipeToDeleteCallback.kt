@@ -22,7 +22,7 @@ class SwipeToDeleteCallback(
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
     private val background: ColorDrawable = ColorDrawable(Color.RED)
-    private val binIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.delete)!!
+    private val binIcon: Drawable = ContextCompat.getDrawable(context, R.drawable.archive)!!
     private val iconMargin: Int = context.resources.getDimensionPixelSize(R.dimen.dp_20)
     private val swipeThreshold: Float = 0.10f
 
@@ -36,7 +36,11 @@ class SwipeToDeleteCallback(
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-        adapter.removeItem(position)
+        if(canItemBeSwiped(position)) {
+            adapter.removeItem(position)
+        } else {
+            notifyDataSetChanged()
+        }
     }
 
     override fun onChildDraw(
@@ -52,6 +56,13 @@ class SwipeToDeleteCallback(
 
         val itemView = viewHolder.itemView
         val itemHeight = itemView.bottom - itemView.top
+        val position = viewHolder.adapterPosition
+
+        if (!canItemBeSwiped(position)) {
+            // If the item should not be swiped, reset the translationX to prevent swiping
+            viewHolder.itemView.translationX = 0f
+            return
+        }
 
         background.setBounds(
             itemView.left + dX.toInt(),
@@ -117,7 +128,8 @@ class SwipeToDeleteCallback(
 
     private fun canItemBeSwiped(position: Int): Boolean {
         return position in 0 until adapter.itemCount
-                && adapter.getItemAtPosition(position)?.isArchived == true
+                && adapter.getItemAtPosition(position)?.operations?.manualArchive == true
+                && adapter.getItemAtPosition(position)?.isArchived == false
     }
 
     private fun notifyDataSetChanged() {

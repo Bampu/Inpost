@@ -28,7 +28,7 @@ class ShipmentListViewModel @Inject constructor(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    private var currentFiltering = ShipmentStatus.ALL
+    private var currentFiltering: ShipmentStatus? = ShipmentStatus.ALL
 
     private val _getRawJson = MutableLiveData<Boolean>()
     val getRawJson: LiveData<Boolean>
@@ -56,20 +56,28 @@ class ShipmentListViewModel @Inject constructor(
         shipments: List<AdapterItem.Shipment>
     ): List<AdapterItem.Shipment> {
         val shipmentsToShow = ArrayList<AdapterItem.Shipment>()
-        val filteringTypeName = currentFiltering.name
-        for (shipment in shipments) {
-            val statusName = ShipmentStatus.valueOfOrNull(shipment.status)?.name
-            when (currentFiltering) {
-                ShipmentStatus.ALL -> {
-                    shipmentsToShow.clear()
-                    shipmentsToShow.addAll(shipments)
-                }
+        val filteringTypeName = currentFiltering?.name
+        currentFiltering?.let {
+            for (shipment in shipments) {
+                val statusName = ShipmentStatus.valueOfOrNull(shipment.status)?.name
+                when (currentFiltering) {
+                    ShipmentStatus.ALL -> {
+                        shipmentsToShow.clear()
+                        shipmentsToShow.addAll(shipments)
+                    }
 
-                else -> {
-                    if (statusName.equals(filteringTypeName)) shipmentsToShow.add(shipment)
+                    ShipmentStatus.READY_TO_PICKUP -> {
+                        if (statusName.equals(filteringTypeName)) shipmentsToShow.add(shipment)
+                    }
+
+                    else -> {
+                        shipmentsToShow.add(shipment)
+                    }
                 }
             }
         }
+            ?: return shipments.filter { ShipmentStatus.valueOfOrNull(it.status)?.priority != ShipmentStatus.READY_TO_PICKUP.priority }
+
         return shipmentsToShow
     }
 
@@ -81,12 +89,12 @@ class ShipmentListViewModel @Inject constructor(
             } else if (shipments is Result.Error) {
                 throw shipments.exception
             }
-            delay(300L)
+            delay(DELAY)
             _dataLoading.value = false
         }
     }
 
-    private fun setFiltering(requestType: ShipmentStatus) {
+    private fun setFiltering(requestType: ShipmentStatus?) {
         _dataLoading.value = true
         currentFiltering = requestType
         loadShipments()
@@ -97,8 +105,8 @@ class ShipmentListViewModel @Inject constructor(
         setFiltering(ShipmentStatus.READY_TO_PICKUP)
     }
 
-    fun showOtherShipments() {
-        setFiltering(ShipmentStatus.OTHER)
+    fun showRemainingShipments() {
+        setFiltering(null)
     }
 
     fun loadAllShipments() {
@@ -113,8 +121,6 @@ class ShipmentListViewModel @Inject constructor(
             } else if (archived is Result.Error) {
                 throw archived.exception
             }
-            //delay  is used only to simulate a longer response from the API to show progress loader
-            delay(500L)
             _dataLoading.value = false
         }
     }
@@ -127,7 +133,6 @@ class ShipmentListViewModel @Inject constructor(
             } else if (shipments is Result.Error) {
                 throw shipments.exception
             }
-            delay(500L)
             _dataLoading.value = false
         }
     }
@@ -145,5 +150,6 @@ class ShipmentListViewModel @Inject constructor(
 
     companion object {
         const val FIRST_TIME_DATA_LOAD = "FIRST_TIME_DATA_LOAD"
+        const val DELAY = 300L
     }
 }

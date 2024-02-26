@@ -3,6 +3,10 @@ package pl.inpost.recruitmenttask.ui.shipment
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.junit.Before
 import org.junit.Rule
+import org.mockito.Mock
+import org.mockito.Mockito
+import pl.inpost.recruitmenttask.data.source.local.CustomSharedPreferences
+import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.data.source.model.EventLog
 import pl.inpost.recruitmenttask.data.source.model.Operations
 import pl.inpost.recruitmenttask.data.source.model.Receiver
@@ -13,6 +17,7 @@ class ShipmentListViewModelTest {
 
     private lateinit var viewModel: ShipmentListViewModel
     private lateinit var shipmentsRepository: FakeShipmentRepository
+    private lateinit var sharedPreferences: CustomSharedPreferences
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
@@ -20,8 +25,9 @@ class ShipmentListViewModelTest {
     @Before
     fun setupViewModel() {
         shipmentsRepository = FakeShipmentRepository()
+        sharedPreferences = Mockito.mock(CustomSharedPreferences::class.java)
 
-        val shipment1 = Shipment(
+        val shipment1 = AdapterItem.Shipment(
             arrayListOf(EventLog("date", "name")),
             "expiry date",
             "112313213121",
@@ -43,7 +49,7 @@ class ShipmentListViewModelTest {
             false
         )
 
-        val shipment2 = Shipment(
+        val shipment2 = AdapterItem.Shipment(
             arrayListOf(EventLog("date2", "name2")),
             "expiry date2",
             "22222222222",
@@ -67,6 +73,6 @@ class ShipmentListViewModelTest {
 
         shipmentsRepository.addShipments(shipment1, shipment2)
 
-        viewModel = ShipmentListViewModel(shipmentsRepository)
+        viewModel = ShipmentListViewModel(shipmentsRepository, sharedPreferences)
     }
 }
