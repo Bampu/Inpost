@@ -9,7 +9,7 @@ import pl.inpost.recruitmenttask.data.Result
 import pl.inpost.recruitmenttask.data.Result.Error
 import pl.inpost.recruitmenttask.data.Result.Success
 import pl.inpost.recruitmenttask.data.source.local.LocalDataSource
-import pl.inpost.recruitmenttask.data.source.model.Shipment
+import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.data.source.remote.RemoteDataSource
 import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 import javax.inject.Inject
@@ -18,16 +18,20 @@ class DefaultShipmentsRepository @Inject constructor(
     private val shipmentLocalDataSource: LocalDataSource,
     private val shipmentsRemoteDataSource: RemoteDataSource
 ) : ShipmentsRepository {
-    override suspend fun getShipments(json: String?): Result<List<Shipment>> {
-        try {
-            updateShipmentsFromRemoteDataSource(json)
-        } catch (ex: Exception) {
-            return Error(ex)
+
+
+    override suspend fun getShipments(json: String?): Result<List<AdapterItem.Shipment>> {
+        json?.let {
+            try {
+                updateShipmentsFromRemoteDataSource(json)
+            } catch (ex: Exception) {
+                return Error(ex)
+            }
         }
         return shipmentLocalDataSource.getShipments()
     }
 
-    override suspend fun getArchived(): Result<List<Shipment>> {
+    override suspend fun getArchived(): Result<List<AdapterItem.Shipment>> {
         return try {
             shipmentLocalDataSource.getArchived()
         } catch (e: Exception) {
@@ -35,8 +39,11 @@ class DefaultShipmentsRepository @Inject constructor(
         }
     }
 
-    private suspend fun updateShipmentsFromRemoteDataSource(json: String?) {
+    override suspend fun archiveShipment(archive: AdapterItem.Shipment) {
+        shipmentLocalDataSource.archiveShipment(archive)
+    }
 
+    private suspend fun updateShipmentsFromRemoteDataSource(json: String?) {
         val remoteShipments = shipmentsRemoteDataSource.getShipments(json)
 
         if (remoteShipments is Success) {
@@ -49,7 +56,7 @@ class DefaultShipmentsRepository @Inject constructor(
         }
     }
 
-    override fun observeShipments(): LiveData<Result<List<Shipment>>> {
+    override fun observeShipments(): LiveData<Result<List<AdapterItem.Shipment>>> {
         return shipmentLocalDataSource.observeShipments()
     }
 

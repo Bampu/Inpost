@@ -3,11 +3,11 @@ package pl.inpost.recruitmenttask.utils
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.data.source.model.EventLog
 import pl.inpost.recruitmenttask.data.source.model.Operations
 import pl.inpost.recruitmenttask.data.source.model.Receiver
 import pl.inpost.recruitmenttask.data.source.model.Sender
-import pl.inpost.recruitmenttask.data.source.model.Shipment
 
 class DataClassConverter {
 
@@ -56,13 +56,13 @@ class DataClassConverter {
     }
 
     @TypeConverter
-    fun fromShipmentsList(json: String?): List<Shipment>? {
-        val type = object : TypeToken<List<Shipment>>() {}.type
+    fun fromShipmentsList(json: String?): List<AdapterItem.Shipment>? {
+        val type = object : TypeToken<List<AdapterItem.Shipment>>() {}.type
         return Gson().fromJson(json, type)
     }
 
     @TypeConverter
-    fun toShipmentsList(list: List<Shipment>?): String? {
+    fun toShipmentsList(list: List<AdapterItem.Shipment>?): String? {
         return Gson().toJson(list)
     }
 }

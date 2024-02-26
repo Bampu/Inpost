@@ -9,18 +9,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import pl.inpost.recruitmenttask.R
+import pl.inpost.recruitmenttask.data.source.model.AdapterItem
 import pl.inpost.recruitmenttask.databinding.FragmentShipmentListBinding
 import pl.inpost.recruitmenttask.utils.gone
 import pl.inpost.recruitmenttask.utils.visible
 
 @AndroidEntryPoint
-class ShipmentListFragment : Fragment() {
+class ShipmentListFragment : Fragment(), OnArchivedListener {
 
     private val viewModel: ShipmentListViewModel by viewModels()
     private var _binding: FragmentShipmentListBinding? = null
@@ -85,16 +89,21 @@ class ShipmentListFragment : Fragment() {
 
     private fun setListeners() {
         viewModel.initViewState.observe(viewLifecycleOwner) {
-            shipmentAdapter.setData(it)
-        }
-        viewModel.items.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
+            if(it.isNotEmpty()) {
                 shipmentAdapter.setData(it)
                 hideFilterInfo()
             } else {
                 showEmptyFilterInfo()
             }
         }
+//        viewModel.items.observe(viewLifecycleOwner) {
+//            if (it?.isNotEmpty() == true) {
+//                shipmentAdapter.setData(it)
+//                hideFilterInfo()
+//            } else {
+//                showEmptyFilterInfo()
+//            }
+//        }
         viewModel.dataLoading.observe(viewLifecycleOwner) {
             when(it) {
                 true -> progressLoader.visible()
@@ -109,6 +118,10 @@ class ShipmentListFragment : Fragment() {
         }
     }
 
+//    private fun sortData(dataSet: List<AdapterItem.Shipment>): Pair<List<AdapterItem>, List<AdapterItem>> {
+//        dataSet.filter {  }
+//    }
+
     private fun showEmptyFilterInfo() {
         recyclerView.gone()
         noResultsFound.visible()
@@ -122,10 +135,24 @@ class ShipmentListFragment : Fragment() {
     private fun setupViews() {
         noResultsFound = binding.noResultsFound
         progressLoader = binding.progressBar
-        shipmentAdapter = ShipmentListAdapter()
+        shipmentAdapter = ShipmentListAdapter(this)
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        setRecycleDecorator()
+        setRecycleSwiper()
         setupAdapter()
+    }
+
+    private fun setRecycleDecorator() {
+        val dividerItemDecoration = DividerItemDecoration(requireContext(),1)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.custom_divider)
+        drawable?.let { dividerItemDecoration.setDrawable(it) }
+        recyclerView.addItemDecoration(dividerItemDecoration)
+    }
+
+    private fun setRecycleSwiper() {
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(recyclerView.context, adapter = shipmentAdapter))
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     private fun setupAdapter() {
@@ -134,5 +161,9 @@ class ShipmentListFragment : Fragment() {
 
     companion object {
         fun newInstance() = ShipmentListFragment()
+    }
+
+    override fun onArchived(archive: AdapterItem.Shipment) {
+        viewModel.archiveShipment(archive)
     }
 }

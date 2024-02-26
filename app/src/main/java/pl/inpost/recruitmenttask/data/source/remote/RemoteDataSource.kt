@@ -5,5 +5,5 @@ import pl.inpost.recruitmenttask.data.source.model.ShipmentRemote
 import pl.inpost.recruitmenttask.data.source.ShipmentsDataSource
 
 interface RemoteDataSource : ShipmentsDataSource {
-    suspend fun getShipments(json: String?): Result<ShipmentRemote>
+    suspend fun getShipments(json: String?): Result<ShipmentRemote>?
 }

@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import pl.inpost.recruitmenttask.data.source.local.CustomSharedPreferences
 import pl.inpost.recruitmenttask.data.source.repository.ShipmentsRepository
 import pl.inpost.recruitmenttask.ui.shipment.ShipmentListViewModel
 
@@ -15,7 +16,10 @@ object ViewModelModule {
 
     @Provides
     @ViewModelScoped
-    fun provideYourViewModel(shipmentsRepository: ShipmentsRepository): ViewModel {
-        return ShipmentListViewModel(shipmentsRepository)
+    fun provideYourViewModel(
+        shipmentsRepository: ShipmentsRepository,
+        sharedPreferences: CustomSharedPreferences
+    ): ViewModel {
+        return ShipmentListViewModel(shipmentsRepository, sharedPreferences)
     }
 }
